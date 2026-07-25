@@ -89,7 +89,7 @@ def print_table(expenses):
         print(row_str)
         
     print(separator)
-    print(f"TOTAL SPENT MATCHING CRITERIA: ${total_spent:.2f}")
+    print(f"TOTAL SPENT MATCHING CRITERIA: RM{total_spent:.2f}")
 
 def add_expense_flow(expenses):
     """Executes the user workflow to append a new expense."""
@@ -128,7 +128,7 @@ def filter_expenses_flow(expenses):
         
     # Calculate overall absolute total first
     overall_total = sum(e["amount"] for e in expenses)
-    print(f"📊 Overall Total Spent Across All Records: ${overall_total:.2f}")
+    print(f"Overall Total Spent Across All Records: RM{overall_total:.2f}")
     
     # Gather distinct existing categories
     categories = sorted(list(set(e["category"] for e in expenses)))

@@ -1,6 +1,6 @@
 # personal-expense-tracker
 
-A lightweight, robust Python Command Line Interface (CLI) application built to track, organize, and summarize personal financial expenses cleanly directly inside the terminal.
+A Python Command Line Interface (CLI) application built to track, organize, and summarize personal financial expenses cleanly directly inside the terminal.
 
 ## Key Functional Features
 

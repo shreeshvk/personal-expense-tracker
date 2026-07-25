@@ -22,23 +22,23 @@ def save_expenses(expenses):
         with open(DATA_FILE, "w") as file:
             json.dump(expenses, file, indent=4)
     except IOError:
-        print("\n❌ Error: Could not save data to disk.")
+        print("\nError: Could not save data to disk.")
 
 def get_validated_amount():
     """Strictly validates amount against empty or negative inputs."""
     while True:
         val = input("Enter amount: ").strip()
         if not val:
-            print("❌ Error: Amount cannot be empty. Please enter a valid number.")
+            print("Error: Amount cannot be empty. Please enter a valid number.")
             continue
         try:
             amount = float(val)
             if amount <= 0:
-                print("❌ Error: Amount must be a positive number greater than 0.")
+                print("Error: Amount must be a positive number greater than 0.")
                 continue
             return round(amount, 2)
         except ValueError:
-            print("❌ Error: Invalid input. Please enter a numeric value (e.g., 10.50).")
+            print("Error: Invalid input. Please enter a numeric value (e.g., 10.50).")
 
 def get_validated_date():
     """Strictly validates date formatting to prevent weird or broken dates."""
@@ -51,7 +51,7 @@ def get_validated_date():
             valid_date = datetime.strptime(date_str, "%Y-%m-%d")
             return valid_date.strftime('%Y-%m-%d')
         except ValueError:
-            print("❌ Error: Invalid date or format. Please use exactly YYYY-MM-DD (e.g., 2026-07-25).")
+            print("Error: Invalid date or format. Please use exactly YYYY-MM-DD (e.g., 2026-07-25).")
 
 def print_table(expenses):
     """Displays expenses cleanly in a strict terminal table format."""
@@ -59,14 +59,13 @@ def print_table(expenses):
         print("\nNo expenses found matching the criteria.")
         return
 
-    # Table configuration and padding setup
+    # FIXED: Added the specific pixel padding column widths for each table layout item
     headers = ["ID", "Amount ($)", "Category", "Date", "Note"]
-    col_widths = [4, 12, 15, 12, 30]
+    col_widths = [4, 12, 15, 12, 25]
     
     # Create the separator row line
     separator = "+" + "+".join("-" * (w + 2) for w in col_widths) + "+"
-    
-    print("\n" + separator)
+
     # Header row printing
     header_row = "|" + "|".join(f" {headers[i].ljust(col_widths[i])} " for i in range(len(headers))) + "|"
     print(header_row)
@@ -90,7 +89,7 @@ def print_table(expenses):
         print(row_str)
         
     print(separator)
-    print(f"👉 TOTAL SPENT MATCHING CRITERIA: ${total_spent:.2f}")
+    print(f"TOTAL SPENT MATCHING CRITERIA: ${total_spent:.2f}")
 
 def add_expense_flow(expenses):
     """Executes the user workflow to append a new expense."""
@@ -99,7 +98,7 @@ def add_expense_flow(expenses):
     
     category = input("Enter category (e.g., Food, Transport, Rent): ").strip()
     while not category:
-        print("❌ Error: Category cannot be empty.")
+        print("Error: Category cannot be empty.")
         category = input("Enter category: ").strip()
         
     date = get_validated_date()
@@ -118,7 +117,7 @@ def add_expense_flow(expenses):
     
     expenses.append(new_expense)
     save_expenses(expenses)
-    print("\n✅ Expense added successfully and saved to disk!")
+    print("\nExpense added successfully and saved!")
 
 def filter_expenses_flow(expenses):
     """Filters expenses by category and prints summary breakdown data."""
@@ -161,10 +160,10 @@ def main():
         elif choice == "2":
             filter_expenses_flow(expenses)
         elif choice == "3":
-            print("\n👋 Exiting application. All data is safe in expenses.json. Goodbye!")
+            print("\nExiting application. All data is safe in expenses.json.")
             break
         else:
-            print("\n❌ Invalid option. Please input 1, 2, or 3.")
+            print("\nInvalid option. Please input 1, 2, or 3.")
 
 if __name__ == "__main__":
     main()

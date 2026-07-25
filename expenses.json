@@ -1,0 +1,32 @@
+[
+    {
+        "amount": 100.0,
+        "category": "Food",
+        "date": "2026-07-25",
+        "note": "for tuesday"
+    },
+    {
+        "amount": 200.0,
+        "category": "Subscriptions",
+        "date": "2026-07-25",
+        "note": "Youtube Music"
+    },
+    {
+        "amount": 50.0,
+        "category": "Toll",
+        "date": "2026-07-25",
+        "note": "N/A"
+    },
+    {
+        "amount": 400.0,
+        "category": "Transport",
+        "date": "2026-07-25",
+        "note": "for the whole week"
+    },
+    {
+        "amount": 10.0,
+        "category": "Idk",
+        "date": "2026-07-25",
+        "note": "N/A"
+    }
+]

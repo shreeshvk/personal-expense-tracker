@@ -28,5 +28,11 @@
         "category": "Idk",
         "date": "2026-07-25",
         "note": "N/A"
+    },
+    {
+        "amount": 25.0,
+        "category": "Food",
+        "date": "2026-07-25",
+        "note": "McD lunch"
     }
 ]

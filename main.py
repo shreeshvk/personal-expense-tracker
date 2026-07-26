@@ -327,6 +327,14 @@ def statistics(expenses):
     print(f"Lowest Expense: RM{lowest:.2f}")
     print(f"Number of Expenses: {len(expenses)}")
 
+def clear_expenses():
+    # Clears all expense records from the JSON file.
+
+    with open(DATA_FILE, "w") as file:
+        json.dump([], file, indent=4)
+
+    print("\nAll expenses have been cleared.")
+
 def main():
     # Loads existing expenses and runs the main menu.
 
@@ -343,8 +351,9 @@ def main():
         print("5. Category Spending Summary")
         print("6. Overall Statistics")
         print("7. Exit Application")
+        print("8. Clear All Expenses")
 
-        choice = input("\nChoose an option (1-7): ").strip()
+        choice = input("\nChoose an option (1-8): ").strip()
 
         if choice == "1":
             add_expense_flow(expenses)
@@ -360,6 +369,8 @@ def main():
             statistics(expenses)
         elif choice == "7":
             print("\nExiting application. All data is safe in expenses.json.")
+        elif choice == "8":
+            clear_expenses()
             break
         else:
             print("\nInvalid option. Please input a number between 1 and 7.")

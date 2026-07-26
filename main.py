@@ -212,6 +212,121 @@ def filter_expenses_flow(expenses):
         print("Invalid sorting option. Displaying without sorting.")
     print_table(filtered)
 
+def edit_expense_flow(expenses):
+    # Allows the user to edit an existing expense.
+    # Requires confirmation before saving changes.
+
+    if not expenses:
+        print("\nNo expenses available to edit.")
+        return
+    print_table(expenses)
+    try:
+        expense_id = int(input("\nEnter expense ID to edit: "))
+        if expense_id < 1 or expense_id > len(expenses):
+            print("Invalid expense ID.")
+            return
+    except ValueError:
+        print("Invalid input. Please enter a number.")
+        return
+    expense = expenses[expense_id - 1]
+    print("\nCurrent expense details:")
+    print(f"Amount: RM{expense['amount']}")
+    print(f"Category: {expense['category']}")
+    print(f"Date: {expense['date']}")
+    print(f"Note: {expense['note']}")
+    confirm = input("\nEdit this expense? (Y/N): ").strip().upper()
+    if confirm != "Y":
+        print("Edit cancelled.")
+        return
+    print("\nEnter new details:")
+    expense["amount"] = get_validated_amount()
+    category = input("Enter category: ").strip()
+    while not category:
+        print("Error: Category cannot be empty.")
+        category = input("Enter category: ").strip()
+    expense["category"] = category.capitalize()
+    expense["date"] = get_validated_date()
+    note = input("Enter note / description: ").strip()
+    if not note:
+        note = "N/A"
+    expense["note"] = note
+
+    save_expenses(expenses)
+
+    print("\nExpense updated successfully!")
+
+def delete_expense_flow(expenses):
+    # Deletes an expense after user confirmation.
+
+    if not expenses:
+        print("\nNo expenses available to delete.")
+        return
+    print_table(expenses)
+    try:
+        expense_id = int(input("\nEnter expense ID to delete: "))
+        if expense_id < 1 or expense_id > len(expenses):
+            print("Invalid expense ID.")
+            return
+    except ValueError:
+        print("Invalid input. Please enter a number.")
+        return
+    expense = expenses[expense_id - 1]
+    print("\nSelected expense:")
+    print(f"RM{expense['amount']} - {expense['category']} - {expense['note']}")
+    confirm = input("\nAre you sure you want to delete this expense? (Y/N): ")
+    if confirm.strip().upper() == "Y":
+        expenses.pop(expense_id - 1)
+        save_expenses(expenses)
+        print("\nExpense deleted successfully!")
+    else:
+        print("\nDelete cancelled.")
+
+def category_summary(expenses):
+    # Displays total spending grouped by category.
+
+    if not expenses:
+        print("\nNo expenses available.")
+        return
+    summary = {}
+    for expense in expenses:
+        category = expense["category"]
+        summary[category] = (
+            summary.get(category, Decimal("0.00"))
+            + expense["amount"]
+        )
+    print("\n--- Category Spending Summary ---")
+    for category, total in sorted(summary.items()):
+        print(f"{category}: RM{total:.2f}")
+
+def statistics(expenses):
+    # Displays overall expense statistics.
+
+    if not expenses:
+        print("\nNo expenses available.")
+        return
+    amounts = [
+        expense["amount"]
+        for expense in expenses
+    ]
+    total = sum(
+        amounts,
+        Decimal("0.00")
+    )
+    average = (
+        total / len(amounts)
+    ).quantize(
+        Decimal("0.01"),
+        rounding=ROUND_HALF_UP
+    )
+    highest = max(amounts)
+    lowest = min(amounts)
+    print("\n--- Overall Statistics ---")
+    print(f"Total Spent: RM{total:.2f}")
+    print(f"Average Expense: RM{average:.2f}")
+    print(f"Highest Expense: RM{highest:.2f}")
+    print(f"Lowest Expense: RM{lowest:.2f}")
+    print(f"Number of Expenses: {len(expenses)}")
+
 def main():
     # Loads existing expenses and runs the main menu.
 

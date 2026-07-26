@@ -350,8 +350,8 @@ def main():
         print("4. Delete Expense")
         print("5. Category Spending Summary")
         print("6. Overall Statistics")
-        print("7. Exit Application")
-        print("8. Clear All Expenses")
+        print("7. Clear All Expenses")
+        print("8. Exit Application")
 
         choice = input("\nChoose an option (1-8): ").strip()
 
@@ -368,9 +368,9 @@ def main():
         elif choice == "6":
             statistics(expenses)
         elif choice == "7":
-            print("\nExiting application. All data is safe in expenses.json.")
-        elif choice == "8":
             clear_expenses()
+        elif choice == "8":
+            print("\nExiting application. All data is safe in expenses.json.")
             break
         else:
             print("\nInvalid option. Please input a number between 1 and 8.")

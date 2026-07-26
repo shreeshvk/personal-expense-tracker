@@ -1,0 +1,56 @@
+[
+    {
+        "amount": 50.0,
+        "category": "Food",
+        "date": "2026-07-25",
+        "note": "N/A"
+    },
+    {
+        "amount": 3.0,
+        "category": "Rent",
+        "date": "2026-07-25",
+        "note": "N/A"
+    },
+    {
+        "amount": 20.0,
+        "category": "Toll",
+        "date": "2026-07-25",
+        "note": "toll for 1 week"
+    },
+    {
+        "amount": 400.0,
+        "category": "Petrol",
+        "date": "2026-07-23",
+        "note": "Petrol Expenses for a week"
+    },
+    {
+        "amount": 30.0,
+        "category": "Food",
+        "date": "2026-05-25",
+        "note": "1 week food expenses"
+    },
+    {
+        "amount": 21.5,
+        "category": "Transport",
+        "date": "2025-06-27",
+        "note": "N/A"
+    },
+    {
+        "amount": 34.3,
+        "category": "Rent",
+        "date": "2024-08-10",
+        "note": "idk"
+    },
+    {
+        "amount": 78.0,
+        "category": "Rent",
+        "date": "9999-02-27",
+        "note": "@"
+    },
+    {
+        "amount": 89.0,
+        "category": "Transport",
+        "date": "0001-01-01",
+        "note": "N/A"
+    }
+]

@@ -373,7 +373,7 @@ def main():
             clear_expenses()
             break
         else:
-            print("\nInvalid option. Please input a number between 1 and 7.")
+            print("\nInvalid option. Please input a number between 1 and 8.")
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AltLift - Workout Adapter</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+  .equipment-card .card-content{
+      border:1px solid rgb(51 65 85);
+      background:#020617;
+      border-radius:14px;
+      padding:18px;
+      text-align:center;
+      cursor:pointer;
+      transition:.25s;
+      font-weight:600;
+  }
+  .equipment-card:hover .card-content{
+      border-color:#f59e0b;
+      transform:translateY(-2px);
+  }
+  .equipment-card input:checked + .card-content{
+      background:#f59e0b;
+      color:#111827;
+      border-color:#f59e0b;
+  }
+  </style>
+</head>
+
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+<main class="w-full max-w-3xl bg-slate-800 rounded-3xl shadow-2xl border border-slate-700 overflow-hidden">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-8 text-slate-900">
+        <h1 class="text-4xl font-black tracking-tight">
+            AltLift
+        </h1>
+        <p class="mt-2 text-sm font-medium opacity-90">
+            Your workout doesn't stop just because someone is using your machine.
+        </p>
+        <p class="mt-4 text-sm max-w-xl text-slate-900/80">
+            Enter the exercise you planned to perform and select the equipment that's currently available.
+            AltLift will instantly recommend two biomechanically similar alternatives.
+        </p>
+    </div>
+    <div class="p-8">
+        <form id="workoutForm" class="space-y-8">
+            <!-- Blocked Exercise -->
+            <div>
+                <label
+                    class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                    Blocked Exercise
+                </label>
+                <input
+                    id="blockedExercise"
+                    type="text"
+                    required
+                    placeholder="Example: Leg Press"
+                    class="w-full rounded-xl bg-slate-900 border border-slate-700 px-4 py-3 text-slate-100 focus:border-amber-500 focus:ring-2 focus:ring-amber-500 outline-none transition">
+            </div>
+            <!-- Equipment -->
+            <div>
+                <label
+                    class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">
+                    Available Equipment
+                </label>
+                <div class="grid md:grid-cols-3 grid-cols-2 gap-3">
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="Dumbbells" hidden>
+                        <div class="card-content">
+                            🏋️ Dumbbells
+                        </div>
+                    </label>
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="Barbell" hidden>
+                        <div class="card-content">
+                            🏋️‍♂️ Barbell
+                        </div>
+                    </label>
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="Cable Machine" hidden>
+                        <div class="card-content">
+                            🔗 Cable Machine
+                        </div>
+                    </label>
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="Smith Machine" hidden>
+                        <div class="card-content">
+                            ⚙️ Smith Machine
+                        </div>
+                    </label>
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="EZ Bar" hidden>
+                        <div class="card-content">
+                            💪 EZ Bar
+                        </div>
+                    </label>
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="Resistance Bands" hidden>
+                        <div class="card-content">
+                            🟡 Resistance Bands
+                        </div>
+                    </label>
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="Bench" hidden>
+                        <div class="card-content">
+                            🪑 Bench
+                        </div>
+                    </label>
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="Pull-Up Bar" hidden>
+                        <div class="card-content">
+                            🟢 Pull-up Bar
+                        </div>
+                    </label>
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="Kettlebells" hidden>
+                        <div class="card-content">
+                            ⚫ Kettlebells
+                        </div>
+                    </label>
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="Bodyweight" hidden>
+                        <div class="card-content">
+                            🤸 Bodyweight
+                        </div>
+                    </label>
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="Medicine Ball" hidden>
+                        <div class="card-content">
+                            🔵 Medicine Ball
+                        </div>
+                    </label>
+                    <label class="equipment-card">
+                        <input type="checkbox" name="equipment" value="TRX Suspension" hidden>
+                        <div class="card-content">
+                            🟠 TRX
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <button
+                type="submit"
+                class="w-full rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-900 font-black py-4 text-lg transition">
+                Find My Alternatives
+            </button>
+        </form>
+    </div>
+
+</main>
+
+<!-- Results Section -->
+<div id="results" class="hidden border-t border-slate-700 p-8">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h2 class="text-2xl font-black text-amber-400">
+                Recommended Alternatives
+            </h2>
+            <p class="text-sm text-slate-400">
+                Similar movement patterns using your available equipment.
+            </p>
+        </div>
+    </div>
+    <div id="alternativesList" class="space-y-4">
+    </div>
+</div>
+
+<script>
+document.getElementById("workoutForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const blocked = document.getElementById("blockedExercise").value;
+    const checkedBoxes = document.querySelectorAll('input[name="equipment"]:checked');
+    const equipment = Array.from(checkedBoxes).map(cb => cb.value);
+
+    if (equipment.length === 0) {
+        alert("Please select at least one available equipment.");
+        return;
+    }
+
+    const resultsDiv = document.getElementById("results");
+    const listDiv = document.getElementById("alternativesList");
+
+    resultsDiv.classList.remove("hidden");
+    listDiv.innerHTML = `
+    <div class="flex items-center gap-4 bg-slate-900 border border-slate-700 rounded-xl p-5">
+        <div class="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+        <div>
+            <p class="font-bold text-amber-400">Finding the best substitutes...</p>
+            <p class="text-sm text-slate-400">Comparing movement patterns and muscle activation...</p>
+        </div>
+    </div>`;
+
+    try {
+        const response = await fetch("/api/substitute", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ exercise: blocked, equipment })
+        });
+
+        const data = await response.json();
+        listDiv.innerHTML = "";
+
+        data.alternatives.forEach(alt => {
+            const item = document.createElement("div");
+            item.className = "bg-slate-900 border border-slate-700 rounded-2xl p-5";
+            item.innerHTML = `
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="text-xl font-bold text-white">${alt.name}</h3>
+                    <span class="inline-block mt-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold">${alt.targetMuscle}</span>
+                </div>
+                <span class="text-3xl">💪</span>
+            </div>
+            <div class="mt-4">
+                <p class="text-sm text-slate-300">${alt.tip}</p>
+            </div>`;
+            listDiv.appendChild(item);
+        });
+
+    } catch (err) {
+        listDiv.innerHTML = `
+        <div class="bg-red-900/30 border border-red-700 rounded-xl p-5">
+            <p class="font-bold text-red-400">Unable to generate alternatives.</p>
+            <p class="text-sm text-slate-300 mt-2">Please try again in a few moments.</p>
+        </div>`;
+    }
+});
+</script>

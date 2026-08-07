@@ -203,10 +203,20 @@
                 const data = await response.json();
                 listDiv.innerHTML = "";
 
-                data.alternatives.forEach(alt => {
-                    const item = document.createElement("div");
-                    item.className = "bg-slate-900 border border-slate-700 rounded-2xl p-5";
-                    item.innerHTML = `
+                if (!response.ok || data.error) {
+                    listDiv.innerHTML = `
+        <div class="bg-red-900/30 border border-red-700 rounded-xl p-5">
+            <p class="font-bold text-red-400">⚠️ Invalid or Unrecognized Exercise</p>
+            <p class="text-sm text-slate-300 mt-2">${data.error || "Please enter a valid workout exercise."}</p>
+        </div>`;
+                    return;
+                }
+
+                if (data.alternatives && Array.isArray(data.alternatives)) {
+                    data.alternatives.forEach(alt => {
+                        const item = document.createElement("div");
+                        item.className = "bg-slate-900 border border-slate-700 rounded-2xl p-5";
+                        item.innerHTML = `
             <div class="flex justify-between items-start">
                 <div>
                     <h3 class="text-xl font-bold text-white">${alt.name}</h3>
@@ -217,14 +227,15 @@
             <div class="mt-4">
                 <p class="text-sm text-slate-300">${alt.tip}</p>
             </div>`;
-                    listDiv.appendChild(item);
-                });
+                        listDiv.appendChild(item);
+                    });
+                }
 
             } catch (err) {
                 listDiv.innerHTML = `
         <div class="bg-red-900/30 border border-red-700 rounded-xl p-5">
             <p class="font-bold text-red-400">Unable to generate alternatives.</p>
-            <p class="text-sm text-slate-300 mt-2">Please try again in a few moments.</p>
+            <p class="text-sm text-slate-300 mt-2">Please check your connection and try again.</p>
         </div>`;
             }
         });

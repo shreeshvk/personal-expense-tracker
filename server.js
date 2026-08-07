@@ -33,15 +33,12 @@ function validateAIResponse(data) {
     if (
       typeof exercise.name !== "string" ||
       typeof exercise.targetMuscle !== "string" ||
-      typeof exercise.tip !== "string"
+      typeof exercise.tip !== "string" ||
+      exercise.name.trim().length < 2 ||
+      exercise.name.trim().length > 80 ||
+      exercise.targetMuscle.trim().length < 3 ||
+      exercise.tip.trim().length < 10
     ) {
-      return false;
-    }
-    const exists = validExercises.some(
-      valid =>
-        valid.toLowerCase() === exercise.name.toLowerCase()
-    );
-    if (!exists) {
       return false;
     }
   }
@@ -50,32 +47,53 @@ function validateAIResponse(data) {
 
 app.post('/api/substitute', async (req, res) => {
   const { exercise, equipment } = req.body;
-  // DELIVERABLE CHECKLIST: Centralized Context-Aware Hardcoded Fallback Error Handling
-  const muscleGroup = exerciseToMuscle[exercise];
-  const fallbackResponse = {
-    alternatives: fallbackExercises[muscleGroup]
-  };
+  const trimmedExercise = typeof exercise === "string" ? exercise.trim() : "";
 
-  //Input validation
-  if (!exercise || typeof exercise !== "string") {
+  // 1. Upstream Input Validation & Sanitization
+  if (!trimmedExercise || !/[a-zA-Z]{2,}/.test(trimmedExercise)) {
     return res.status(400).json({
-      error: "Please provide a valid exercise."
+      error: "Please enter a valid exercise name containing real letters (e.g., Bench Press, Squat, Lat Pulldown)."
     });
   }
 
   if (!Array.isArray(equipment) || equipment.length === 0) {
     return res.status(400).json({
-      error: "Please select at least one equipment option."
+      error: "Please select at least one available equipment option."
     });
   }
 
+  // Fallback data preparation
+  const muscleGroup = exerciseToMuscle[trimmedExercise];
+  const fallbackResponse = {
+    alternatives: fallbackExercises[muscleGroup] || [
+      {
+        name: "Bodyweight Push-up",
+        targetMuscle: "Chest, Shoulders, Triceps",
+        tip: "Keep a rigid core plank and lower your chest under control to roughly 90 degrees elbow bend."
+      },
+      {
+        name: "Bodyweight Squat",
+        targetMuscle: "Quadriceps, Glutes, Hamstrings",
+        tip: "Maintain a neutral spine and sit back into your hips while driving knees outward over your toes."
+      }
+    ]
+  };
+
   try {
-    // V2: Highly optimized prompt specifying exact JSON schemas
+    // V3: Enhanced prompt with adversarial detection & movement diversity mandate
     const prompt = `You are an expert biomechanics fitness trainer.
-The user wanted to perform this exercise: "${exercise}", but the machine is taken.
-They only have access to these equipment types right now:
-${equipment.join(', ')}
-Provide exactly two biomechanically accurate substitute exercises that hit the identical target muscles.
+The user requested substitute exercises for: "${trimmedExercise}".
+Available equipment: ${equipment.join(', ')}.
+
+STRICT INSTRUCTIONS:
+1. FIRST EVALUATION: Is "${trimmedExercise}" a real workout exercise, common exercise variation, or valid fitness abbreviation/slang?
+   - If "${trimmedExercise}" is non-exercise text, fake/joke exercise (e.g., "Pizza Pressing", "Hello", "test"), or meaningless input, you MUST return exclusively this JSON:
+   {"invalidExercise": true, "error": "\"${trimmedExercise}\" is not a recognized exercise. Please enter a valid workout exercise."}
+
+2. MOVEMENT DIVERSITY MANDATE: If it IS a valid exercise, provide exactly TWO biomechanically accurate substitute exercises that hit identical target muscles.
+   - The two exercises MUST utilize distinctly different movement patterns or setups (e.g., one bilateral compound/isolation and one unilateral movement, or two distinctly different angles).
+   - Do NOT provide two minor variations of the exact same exercise (e.g., do NOT give both Back Squat and Front Squat with resistance bands).
+
 Return your response exclusively as a valid JSON object matching this exact format:
 {
   "alternatives": [
@@ -88,11 +106,27 @@ Return your response exclusively as a valid JSON object matching this exact form
 }
 Do not include any introductory text, markdown wrappers, backticks, or explanation outside the JSON object.`;
 
-    // Call free-tier Gemini Flash model
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt,
-    });
+    // Call Gemini API with automatic model fallback if quota is exceeded
+    const candidateModels = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.0-flash-lite'];
+    let response;
+    let lastError;
+
+    for (const modelName of candidateModels) {
+      try {
+        response = await ai.models.generateContent({
+          model: modelName,
+          contents: prompt,
+        });
+        if (response && response.text) break;
+      } catch (err) {
+        lastError = err;
+        console.warn(`⚠️ Model ${modelName} quota/error: ${err.message.substring(0, 120)}. Trying fallback model...`);
+      }
+    }
+
+    if (!response || !response.text) {
+      throw lastError || new Error("All AI models failed or exceeded quota.");
+    }
 
     const rawText = response.text.trim();
     console.log("Raw AI response:\n", rawText);
@@ -101,6 +135,14 @@ Do not include any introductory text, markdown wrappers, backticks, or explanati
     const cleanJson = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
     const parsedData = JSON.parse(cleanJson);
 
+    // Check if AI detected invalid/fake exercise
+    if (parsedData.invalidExercise) {
+      console.log(`Unrecognized exercise input caught: "${trimmedExercise}"`);
+      return res.status(400).json({
+        error: parsedData.error || `"${trimmedExercise}" is not a recognized exercise. Please enter a valid workout exercise.`
+      });
+    }
+
     if (!validateAIResponse(parsedData)) {
       console.log("AI validation failed. Using fallback.");
       return res.json(fallbackResponse);
@@ -108,7 +150,6 @@ Do not include any introductory text, markdown wrappers, backticks, or explanati
     res.json(parsedData);
   } catch (error) {
     console.error("⚠️ System caught an API or parsing exception:", error.message);
-    // Return safe fallback response if AI request or parsing fails
     res.json(fallbackResponse);
   }
 });
